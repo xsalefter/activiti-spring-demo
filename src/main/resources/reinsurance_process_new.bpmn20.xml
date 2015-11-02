@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="reinsurance_process_new" name="Re-Insurance Process - New" isExecutable="true">
+    <startEvent id="sid-F1B174BD-AD58-4078-A0A1-F699AB143E42"></startEvent>
+    <userTask id="form_receive_offer" name="Receive an offers" activiti:candidateGroups="reindo-front-admin">
+      <extensionElements>
+        <activiti:formProperty id="business_classified" name="Business Classified" type="enum" variable="business_classified" required="true">
+          <activiti:value id="HIO" name="HIO"></activiti:value>
+          <activiti:value id="MC" name="MC"></activiti:value>
+          <activiti:value id="CIT" name="CIT"></activiti:value>
+          <activiti:value id="Others" name="Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="facultative_code" name="Facultative Code" type="string" variable="facultative_code"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-0BCC8AE4-EB35-4E8A-8358-9C5D45104014" sourceRef="sid-F1B174BD-AD58-4078-A0A1-F699AB143E42" targetRef="form_receive_offer"></sequenceFlow>
+    <userTask id="form_input_ceding_data" name="Input Ceding Data" activiti:candidateGroups="reindo-front-admin">
+      <extensionElements>
+        <activiti:formProperty id="facultative_code" name="Facultative Code" type="string" variable="facultative_code" writable="false" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ceding_name" name="Ceding Name" type="string" variable="ceding_name" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ceding_address" name="Address" type="string" variable="ceding_address" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ceding_contact_email" name="Contact Email" type="string" variable="ceding_contact_email" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ceding_contact_phone" name="Contact Phone Number" type="string" variable="ceding_contact_phone" required="true"></activiti:formProperty>
+        <activiti:formProperty id="application_status" name="Status" type="enum" variable="application_status" required="true">
+          <activiti:value id="P11 - Offer In Process" name="P11 - Offer In Process"></activiti:value>
+          <activiti:value id="A01 - Accept" name="A01 - Accept"></activiti:value>
+          <activiti:value id="D01 - Reject" name="D01 - Reject"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="share_in_percent" name="Share in Percentage" type="long" variable="share_in_percent" required="true"></activiti:formProperty>
+        <activiti:formProperty id="application_amount" name="Amount" type="long" variable="application_amount" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <serviceTask id="process_ceding_data" name="Save Ceding Data" activiti:class="com.baeldung.activitispringdemo.activiti.CedingCreator"></serviceTask>
+    <sequenceFlow id="sid-6E6CB4B2-6C85-4592-9C67-A31F8F5E0D95" sourceRef="form_input_ceding_data" targetRef="process_ceding_data"></sequenceFlow>
+    <userTask id="acceptance_process" name="Acceptance Process" activiti:candidateGroups="reindo-underwriter"></userTask>
+    <sequenceFlow id="sid-52D2C530-20AA-4F18-ADE2-56410C928F6E" sourceRef="process_ceding_data" targetRef="acceptance_process"></sequenceFlow>
+    <serviceTask id="update_master_data" name="Update Master Data" activiti:class="com.baeldung.activitispringdemo.activiti.CedingUpdater"></serviceTask>
+    <serviceTask id="send_email_to_ceding" name="Send Notification Email for Ceding" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${ceding_contact_email}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="from">
+          <activiti:expression><![CDATA[${assignee}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Hello World]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:string><![CDATA[This is Hello World email.]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <endEvent id="sid-980E8C0E-127D-49B1-912D-22F2BDBE401E"></endEvent>
+    <sequenceFlow id="sid-886208E6-5343-4179-8954-5BE4877F1B54" sourceRef="send_email_to_ceding" targetRef="sid-980E8C0E-127D-49B1-912D-22F2BDBE401E"></sequenceFlow>
+    <sequenceFlow id="sid-E127D71E-F990-4792-BB4B-1A61C1F57B2A" sourceRef="acceptance_process" targetRef="update_master_data"></sequenceFlow>
+    <sequenceFlow id="sid-77B89D7F-4911-4FC3-B786-47C87D85DAB9" sourceRef="update_master_data" targetRef="send_email_to_ceding"></sequenceFlow>
+    <serviceTask id="check_facultative_code_and_business_class" name="Check for facultative code and business classified" activiti:class="com.baeldung.activitispringdemo.activiti.FacultativeCodeAndBusinessClassifiedHandler"></serviceTask>
+    <sequenceFlow id="sid-855E3753-53AC-4001-8349-A2639256F4D1" sourceRef="form_receive_offer" targetRef="check_facultative_code_and_business_class"></sequenceFlow>
+    <exclusiveGateway id="sid-CB737DCE-3267-421E-BD13-1CB16FDD167E">
+      <documentation>if (business_classified == "Other" and facultative_code == "") 
+  then throw BusinessError("business_class 'other' should have facultative_code.");</documentation>
+    </exclusiveGateway>
+    <endEvent id="sid-D6AA4523-CD80-4DEF-8366-E749FE02BEFE">
+      <errorEventDefinition></errorEventDefinition>
+    </endEvent>
+    <sequenceFlow id="sid-845614EC-E078-466F-BE56-DB660A608C47" sourceRef="check_facultative_code_and_business_class" targetRef="sid-CB737DCE-3267-421E-BD13-1CB16FDD167E"></sequenceFlow>
+    <sequenceFlow id="sid-BDD9B557-2A5F-4D6C-A121-78ABF2669537" sourceRef="sid-CB737DCE-3267-421E-BD13-1CB16FDD167E" targetRef="form_input_ceding_data">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${is_valid_combination == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-7CDB3F17-AA4C-47C2-8EB5-14E46ADB5DB3" sourceRef="sid-CB737DCE-3267-421E-BD13-1CB16FDD167E" targetRef="sid-D6AA4523-CD80-4DEF-8366-E749FE02BEFE">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${is_valid_combination == false}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_reinsurance_process_new">
+    <bpmndi:BPMNPlane bpmnElement="reinsurance_process_new" id="BPMNPlane_reinsurance_process_new">
+      <bpmndi:BPMNShape bpmnElement="sid-F1B174BD-AD58-4078-A0A1-F699AB143E42" id="BPMNShape_sid-F1B174BD-AD58-4078-A0A1-F699AB143E42">
+        <omgdc:Bounds height="30.0" width="30.0" x="15.0" y="232.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="form_receive_offer" id="BPMNShape_form_receive_offer">
+        <omgdc:Bounds height="80.0" width="100.0" x="120.0" y="207.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="form_input_ceding_data" id="BPMNShape_form_input_ceding_data">
+        <omgdc:Bounds height="80.0" width="100.0" x="630.0" y="207.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="process_ceding_data" id="BPMNShape_process_ceding_data">
+        <omgdc:Bounds height="80.0" width="100.0" x="825.0" y="207.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="acceptance_process" id="BPMNShape_acceptance_process">
+        <omgdc:Bounds height="80.0" width="100.0" x="1020.0" y="207.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="update_master_data" id="BPMNShape_update_master_data">
+        <omgdc:Bounds height="80.0" width="100.0" x="1020.0" y="435.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="send_email_to_ceding" id="BPMNShape_send_email_to_ceding">
+        <omgdc:Bounds height="80.0" width="100.0" x="825.0" y="435.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-980E8C0E-127D-49B1-912D-22F2BDBE401E" id="BPMNShape_sid-980E8C0E-127D-49B1-912D-22F2BDBE401E">
+        <omgdc:Bounds height="28.0" width="28.0" x="666.0" y="461.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="check_facultative_code_and_business_class" id="BPMNShape_check_facultative_code_and_business_class">
+        <omgdc:Bounds height="80.0" width="100.0" x="300.0" y="207.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-CB737DCE-3267-421E-BD13-1CB16FDD167E" id="BPMNShape_sid-CB737DCE-3267-421E-BD13-1CB16FDD167E">
+        <omgdc:Bounds height="40.0" width="40.0" x="495.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-D6AA4523-CD80-4DEF-8366-E749FE02BEFE" id="BPMNShape_sid-D6AA4523-CD80-4DEF-8366-E749FE02BEFE">
+        <omgdc:Bounds height="28.0" width="28.0" x="666.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-BDD9B557-2A5F-4D6C-A121-78ABF2669537" id="BPMNEdge_sid-BDD9B557-2A5F-4D6C-A121-78ABF2669537">
+        <omgdi:waypoint x="534.5579268292682" y="247.9420731707317"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="247.65197568389058"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-7CDB3F17-AA4C-47C2-8EB5-14E46ADB5DB3" id="BPMNEdge_sid-7CDB3F17-AA4C-47C2-8EB5-14E46ADB5DB3">
+        <omgdi:waypoint x="515.5" y="228.0"></omgdi:waypoint>
+        <omgdi:waypoint x="515.5" y="134.0"></omgdi:waypoint>
+        <omgdi:waypoint x="666.0" y="134.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-855E3753-53AC-4001-8349-A2639256F4D1" id="BPMNEdge_sid-855E3753-53AC-4001-8349-A2639256F4D1">
+        <omgdi:waypoint x="220.0" y="247.5"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="247.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-0BCC8AE4-EB35-4E8A-8358-9C5D45104014" id="BPMNEdge_sid-0BCC8AE4-EB35-4E8A-8358-9C5D45104014">
+        <omgdi:waypoint x="45.0" y="247.5"></omgdi:waypoint>
+        <omgdi:waypoint x="120.0" y="247.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-6E6CB4B2-6C85-4592-9C67-A31F8F5E0D95" id="BPMNEdge_sid-6E6CB4B2-6C85-4592-9C67-A31F8F5E0D95">
+        <omgdi:waypoint x="730.0" y="247.5"></omgdi:waypoint>
+        <omgdi:waypoint x="825.0" y="247.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-886208E6-5343-4179-8954-5BE4877F1B54" id="BPMNEdge_sid-886208E6-5343-4179-8954-5BE4877F1B54">
+        <omgdi:waypoint x="825.0" y="475.0"></omgdi:waypoint>
+        <omgdi:waypoint x="694.0" y="475.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-E127D71E-F990-4792-BB4B-1A61C1F57B2A" id="BPMNEdge_sid-E127D71E-F990-4792-BB4B-1A61C1F57B2A">
+        <omgdi:waypoint x="1070.0" y="287.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1070.0" y="435.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-77B89D7F-4911-4FC3-B786-47C87D85DAB9" id="BPMNEdge_sid-77B89D7F-4911-4FC3-B786-47C87D85DAB9">
+        <omgdi:waypoint x="1020.0" y="475.0"></omgdi:waypoint>
+        <omgdi:waypoint x="925.0" y="475.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-52D2C530-20AA-4F18-ADE2-56410C928F6E" id="BPMNEdge_sid-52D2C530-20AA-4F18-ADE2-56410C928F6E">
+        <omgdi:waypoint x="925.0" y="247.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1020.0" y="247.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-845614EC-E078-466F-BE56-DB660A608C47" id="BPMNEdge_sid-845614EC-E078-466F-BE56-DB660A608C47">
+        <omgdi:waypoint x="400.0" y="247.5"></omgdi:waypoint>
+        <omgdi:waypoint x="495.0" y="247.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
