@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -35,13 +34,11 @@ public class ReInsuranceProcessV2IntegrationTest {
     private TaskService taskService;
     private RuntimeService runtimeService;
     private IdentityService identityService;
-    private FormService formService;
 
     private void initActivitiObjects() {
         this.taskService = this.activitiRule.getTaskService();
         this.runtimeService = this.activitiRule.getRuntimeService();
         this.identityService = this.activitiRule.getIdentityService();
-        this.formService = this.activitiRule.getFormService();
     }
 
     private void initUsersAndGroups() {

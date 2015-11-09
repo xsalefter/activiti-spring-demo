@@ -1,9 +1,7 @@
 package com.baeldung.activitispringdemo.activiti;
 
-import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +16,7 @@ implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        final TaskService taskService = execution.getEngineServices().getTaskService();
-        final Task task = taskService.createTaskQuery().singleResult();
-        logger.info(">>> execute() in FacultativeCodeAndBusinessClassifiedHandler. Task ID={}, Name={}, Variables={}", task.getId(), task.getName(), execution.getVariables());
+        logger.info(">>> execute() in FacultativeCodeAndBusinessClassifiedHandler. Variables={}", execution.getVariables());
 
         final String businessClassifiedAsString = execution.getVariable("business_classified").toString();
         final BusinessClassified businessClassified = BusinessClassified.valueOf(businessClassifiedAsString);
