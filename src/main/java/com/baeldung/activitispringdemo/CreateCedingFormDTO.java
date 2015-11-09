@@ -78,5 +78,12 @@ public class CreateCedingFormDTO implements Serializable {
         return amount;
     }
 
+    @Override
+    public String toString() {
+        return "CreateCedingFormDTO [facultativeCode=" + facultativeCode + ", cedingName=" + cedingName + ", address="
+                + address + ", contactEmail=" + contactEmail + ", contactPhone=" + contactPhone + ", status=" + status
+                + ", shareInPercent=" + shareInPercent + ", amount=" + amount + "]";
+    }
+
 
 }

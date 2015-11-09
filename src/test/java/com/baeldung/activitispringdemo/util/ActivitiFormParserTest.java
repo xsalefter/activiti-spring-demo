@@ -64,7 +64,7 @@ public class ActivitiFormParserTest {
     }
 
     @Test
-    public void whenGetEnumCalled_ThenResultShouldBeValid() {
+    public void whenGetEnumCalledOfferInProcess_ThenResultShouldBeValid() {
         when(this.execution.getVariable("application_status")).thenReturn("P11 - Offer In Process");
 
         final String applicationStatus = this.execution.getVariable("application_status").toString();
@@ -75,5 +75,18 @@ public class ActivitiFormParserTest {
 
         // Cool, huh?
         assertThat(status, is(CedingApplicationStatus.P11_Offer_In_Progress));
+    }
+
+    @Test
+    public void whenGetEnumCalledAccept_ThenResultShouldBeValid() {
+        when(this.execution.getVariable("application_status")).thenReturn("A01 - Accept");
+
+        final String applicationStatus = this.execution.getVariable("application_status").toString();
+        assertThat(applicationStatus, is("A01 - Accept"));
+
+        final ActivitiFormParser parser = new ActivitiFormParser(this.execution);
+        final CedingApplicationStatus status = parser.getEnum(CedingApplicationStatus.class, "application_status");
+
+        assertThat(status, is(CedingApplicationStatus.A01_Accept));
     }
 }
