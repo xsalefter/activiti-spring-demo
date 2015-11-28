@@ -12,7 +12,6 @@ public class CedingApplicationCreator implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         logger.info(">>> execute() method on CedingApplicationCreator. Variables:{}", execution.getVariables());
-        // Persisting data to database?
     }
 
 }

@@ -11,6 +11,12 @@
     <property name="jdbcDriver" value="org.h2.Driver" />
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
+
+    <property name="mailServerHost" value="localhost" />
+    <property name="mailServerPort" value="11111" />
+    <property name="mailServerDefaultFrom" value="syml.dev@gmail.com" />
+    <property name="mailServerUsername" value="" />
+    <property name="mailServerPassword" value="" />
   </bean>
 
 </beans>

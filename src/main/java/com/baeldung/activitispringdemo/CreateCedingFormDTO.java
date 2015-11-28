@@ -11,14 +11,17 @@ public class CreateCedingFormDTO implements Serializable {
 
     private static final long serialVersionUID = 5313448853795481125L;
 
-    private final String facultativeCode;
-    private final String cedingName;
-    private final String address;
-    private final String contactEmail;
-    private final String contactPhone;
-    private final CedingApplicationStatus status;
-    private final float shareInPercent;
-    private final BigDecimal amount;
+    private String facultativeCode;
+    private String cedingName;
+    private String address;
+    private String contactEmail;
+    private String contactPhone;
+    private CedingApplicationStatus status;
+    private float shareInPercent;
+    private BigDecimal amount;
+
+    public CreateCedingFormDTO() {
+    }
 
     public CreateCedingFormDTO(final DelegateExecution execution) {
         final ActivitiFormParser parser = new ActivitiFormParser(execution);
@@ -33,49 +36,68 @@ public class CreateCedingFormDTO implements Serializable {
         this.amount = BigDecimal.ZERO;
     }
 
-    public CreateCedingFormDTO(String facultativeCode, String cedingName, String address, String contactEmail,
-            String contactPhone, CedingApplicationStatus status, float shareInPercent, BigDecimal amount) {
-        super();
-        this.facultativeCode = facultativeCode;
-        this.cedingName = cedingName;
-        this.address = address;
-        this.contactEmail = contactEmail;
-        this.contactPhone = contactPhone;
-        this.status = status;
-        this.shareInPercent = shareInPercent;
-        this.amount = amount;
-    }
-
     public String getFacultativeCode() {
         return facultativeCode;
+    }
+
+    public void setFacultativeCode(String facultativeCode) {
+        this.facultativeCode = facultativeCode;
     }
 
     public String getCedingName() {
         return cedingName;
     }
 
+    public void setCedingName(String cedingName) {
+        this.cedingName = cedingName;
+    }
+
     public String getAddress() {
         return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getContactEmail() {
         return contactEmail;
     }
 
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
+
     public String getContactPhone() {
         return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
     }
 
     public CedingApplicationStatus getStatus() {
         return status;
     }
 
+    public void setStatus(CedingApplicationStatus status) {
+        this.status = status;
+    }
+
     public float getShareInPercent() {
         return shareInPercent;
     }
 
+    public void setShareInPercent(float shareInPercent) {
+        this.shareInPercent = shareInPercent;
+    }
+
     public BigDecimal getAmount() {
         return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     @Override
@@ -84,6 +106,5 @@ public class CreateCedingFormDTO implements Serializable {
                 + address + ", contactEmail=" + contactEmail + ", contactPhone=" + contactPhone + ", status=" + status
                 + ", shareInPercent=" + shareInPercent + ", amount=" + amount + "]";
     }
-
 
 }

@@ -12,7 +12,6 @@ public class CedingApplicationUpdater implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         logger.info(">>> execute() in CedingApplicationUpdater. Variables={}", execution.getVariables());
-        execution.setVariable("assignee", "me@gmail.com");
     }
 
 }

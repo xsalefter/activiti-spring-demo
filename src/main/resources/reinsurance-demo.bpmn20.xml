@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://activiti.org/test">
+  <collaboration id="Collaboration">
+    <participant id="pool" name="Re-Insurance Demo" processRef="re_insurance_demo"></participant>
+  </collaboration>
+  <process id="re_insurance_demo" name="Re-Insurance Demo" isExecutable="true">
+    <laneSet id="laneSet_process">
+      <lane id="front-admin-lane" name="Front Admin">
+        <flowNodeRef>start_event</flowNodeRef>
+        <flowNodeRef>receive_an_offers_form</flowNodeRef>
+        <flowNodeRef>check_code_and_business_class</flowNodeRef>
+        <flowNodeRef>found_notfound_gateway</flowNodeRef>
+        <flowNodeRef>input_ceding_application_form</flowNodeRef>
+        <flowNodeRef>error_code_notfound</flowNodeRef>
+        <flowNodeRef>save_ceding_application</flowNodeRef>
+        <flowNodeRef>start_to_receive_offers</flowNodeRef>
+        <flowNodeRef>offers_to_checker</flowNodeRef>
+        <flowNodeRef>save_to_acceptance</flowNodeRef>
+        <flowNodeRef>input_ceding_to_save</flowNodeRef>
+        <flowNodeRef>checker_to_gateway</flowNodeRef>
+        <flowNodeRef>checker_gateway_to_input_ceding</flowNodeRef>
+        <flowNodeRef>checker_gateway_to_end_error</flowNodeRef>
+      </lane>
+      <lane id="underwriter-lane" name="Underwriter">
+        <flowNodeRef>ceding_acceptance_form</flowNodeRef>
+        <flowNodeRef>update_master_data</flowNodeRef>
+        <flowNodeRef>end_event</flowNodeRef>
+        <flowNodeRef>update_to_end</flowNodeRef>
+        <flowNodeRef>acceptance_to_update_master</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="start_event" activiti:initiator="initiator"></startEvent>
+    <userTask id="receive_an_offers_form" name="Receive an Offers" activiti:candidateGroups="front-admin">
+      <extensionElements>
+        <activiti:formProperty id="business_classified" name="Business Classified" type="enum" variable="business_classified" required="true">
+          <activiti:value id="HIO" name="HIO"></activiti:value>
+          <activiti:value id="MC" name="MC"></activiti:value>
+          <activiti:value id="CIT" name="CIT"></activiti:value>
+          <activiti:value id="Others" name="Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="facultative_code" name="Facultative Code" type="string" variable="facultative_code"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <serviceTask id="check_code_and_business_class" name="Check for facultative code and business classified" activiti:class="com.baeldung.activitispringdemo.activiti.FacultativeCodeAndBusinessClassifiedHandler"></serviceTask>
+    <exclusiveGateway id="found_notfound_gateway"></exclusiveGateway>
+    <userTask id="input_ceding_application_form" name="Input ceding application" activiti:candidateGroups="front-admin">
+      <extensionElements>
+        <activiti:formProperty id="ceding_name" name="Ceding Name" type="string" variable="ceding_name" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ceding_address" name="Ceding Address" type="string" variable="ceding_address" required="true"></activiti:formProperty>
+        <activiti:formProperty id="contact_email" name="Ceding Contact Email" type="string" variable="contact_email" required="true"></activiti:formProperty>
+        <activiti:formProperty id="contact_phone" name="Ceding Phone Number" type="string" variable="contact_phone" required="true"></activiti:formProperty>
+        <activiti:formProperty id="application_status" name="Application Status" type="enum" variable="application_status" required="true">
+          <activiti:value id="P11 - Offer In Process" name="P11 - Offer In Process"></activiti:value>
+          <activiti:value id="A01 - Accept" name="A01 - Accept"></activiti:value>
+          <activiti:value id="D01 - Reject" name="D01 - Reject"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="share_in_percent" name="Share in Percentage" type="long" variable="share_in_percent" required="true"></activiti:formProperty>
+        <activiti:formProperty id="application_amount" name="Amount" type="long" variable="application_amount" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="error_code_notfound">
+      <errorEventDefinition></errorEventDefinition>
+    </endEvent>
+    <serviceTask id="save_ceding_application" name="Save Ceding Application" activiti:class="com.baeldung.activitispringdemo.activiti.CedingApplicationCreator"></serviceTask>
+    <userTask id="ceding_acceptance_form" name="Ceding Application Acceptance" activiti:candidateGroups="underwriter">
+      <extensionElements>
+        <activiti:formProperty id="ceding_application_accepted" name="Accept this application" type="string" variable="ceding_application_accepted" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <serviceTask id="update_master_data" name="Update Master Data" activiti:class="com.baeldung.activitispringdemo.activiti.CedingApplicationUpdater"></serviceTask>
+    <endEvent id="end_event"></endEvent>
+    <sequenceFlow id="start_to_receive_offers" sourceRef="start_event" targetRef="receive_an_offers_form"></sequenceFlow>
+    <sequenceFlow id="offers_to_checker" sourceRef="receive_an_offers_form" targetRef="check_code_and_business_class"></sequenceFlow>
+    <sequenceFlow id="update_to_end" sourceRef="update_master_data" targetRef="end_event"></sequenceFlow>
+    <sequenceFlow id="save_to_acceptance" sourceRef="save_ceding_application" targetRef="ceding_acceptance_form"></sequenceFlow>
+    <sequenceFlow id="acceptance_to_update_master" sourceRef="ceding_acceptance_form" targetRef="update_master_data"></sequenceFlow>
+    <sequenceFlow id="input_ceding_to_save" sourceRef="input_ceding_application_form" targetRef="save_ceding_application"></sequenceFlow>
+    <sequenceFlow id="checker_to_gateway" sourceRef="check_code_and_business_class" targetRef="found_notfound_gateway"></sequenceFlow>
+    <sequenceFlow id="checker_gateway_to_input_ceding" name="Found" sourceRef="found_notfound_gateway" targetRef="input_ceding_application_form">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${facultative_code_and_business_class_valid == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="checker_gateway_to_end_error" name="Not found" sourceRef="found_notfound_gateway" targetRef="error_code_notfound">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${facultative_code_and_business_class_valid == false}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Collaboration">
+    <bpmndi:BPMNPlane bpmnElement="Collaboration" id="BPMNPlane_Collaboration">
+      <bpmndi:BPMNShape bpmnElement="pool" id="BPMNShape_pool">
+        <omgdc:Bounds height="456.0" width="1070.75" x="30.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="front-admin-lane" id="BPMNShape_front-admin-lane">
+        <omgdc:Bounds height="228.9945652173913" width="1040.75" x="60.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="start_event" id="BPMNShape_start_event">
+        <omgdc:Bounds height="30.0" width="30.0" x="95.0" y="50.997282608695656"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="receive_an_offers_form" id="BPMNShape_receive_an_offers_form">
+        <omgdc:Bounds height="80.0" width="100.0" x="200.0" y="25.997282608695656"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="check_code_and_business_class" id="BPMNShape_check_code_and_business_class">
+        <omgdc:Bounds height="80.0" width="100.0" x="380.0" y="25.997282608695656"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="found_notfound_gateway" id="BPMNShape_found_notfound_gateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="570.0" y="45.997282608695656"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="input_ceding_application_form" id="BPMNShape_input_ceding_application_form">
+        <omgdc:Bounds height="80.0" width="100.0" x="705.0" y="25.997282608695656"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="error_code_notfound" id="BPMNShape_error_code_notfound">
+        <omgdc:Bounds height="28.0" width="28.0" x="576.0" y="200.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="save_ceding_application" id="BPMNShape_save_ceding_application">
+        <omgdc:Bounds height="80.0" width="100.0" x="930.0" y="25.997282608695656"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="underwriter-lane" id="BPMNShape_underwriter-lane">
+        <omgdc:Bounds height="227.0054347826087" width="1040.75" x="60.0" y="238.9945652173913"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ceding_acceptance_form" id="BPMNShape_ceding_acceptance_form">
+        <omgdc:Bounds height="80.0" width="100.0" x="930.0" y="312.4972826086956"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="update_master_data" id="BPMNShape_update_master_data">
+        <omgdc:Bounds height="80.0" width="100.0" x="705.0" y="312.4972826086956"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end_event" id="BPMNShape_end_event">
+        <omgdc:Bounds height="28.0" width="28.0" x="576.0" y="338.4972826086956"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="offers_to_checker" id="BPMNEdge_offers_to_checker">
+        <omgdi:waypoint x="300.0" y="65.99728260869566"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="65.99728260869566"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="save_to_acceptance" id="BPMNEdge_save_to_acceptance">
+        <omgdi:waypoint x="980.0" y="105.99728260869566"></omgdi:waypoint>
+        <omgdi:waypoint x="980.0" y="312.4972826086956"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="update_to_end" id="BPMNEdge_update_to_end">
+        <omgdi:waypoint x="705.0" y="352.4972826086956"></omgdi:waypoint>
+        <omgdi:waypoint x="604.0" y="352.4972826086956"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="checker_to_gateway" id="BPMNEdge_checker_to_gateway">
+        <omgdi:waypoint x="480.0" y="65.99728260869566"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="65.99728260869566"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="checker_gateway_to_input_ceding" id="BPMNEdge_checker_gateway_to_input_ceding">
+        <omgdi:waypoint x="609.5579268292682" y="66.43935577942736"></omgdi:waypoint>
+        <omgdi:waypoint x="705.0" y="66.14925829258624"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="checker_gateway_to_end_error" id="BPMNEdge_checker_gateway_to_end_error">
+        <omgdi:waypoint x="590.4355944068827" y="85.56168820181296"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0472961590041" y="200.50007989046568"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="start_to_receive_offers" id="BPMNEdge_start_to_receive_offers">
+        <omgdi:waypoint x="125.0" y="65.99728260869566"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="65.99728260869566"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="input_ceding_to_save" id="BPMNEdge_input_ceding_to_save">
+        <omgdi:waypoint x="805.0" y="65.99728260869566"></omgdi:waypoint>
+        <omgdi:waypoint x="930.0" y="65.99728260869566"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="acceptance_to_update_master" id="BPMNEdge_acceptance_to_update_master">
+        <omgdi:waypoint x="930.0" y="352.4972826086956"></omgdi:waypoint>
+        <omgdi:waypoint x="805.0" y="352.4972826086956"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
