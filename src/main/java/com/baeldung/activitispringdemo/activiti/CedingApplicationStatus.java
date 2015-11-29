@@ -1,4 +1,4 @@
-package com.baeldung.activitispringdemo;
+package com.baeldung.activitispringdemo.activiti;
 
 import com.baeldung.activitispringdemo.util.TransformableEnum;
 

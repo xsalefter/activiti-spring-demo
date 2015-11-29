@@ -3,7 +3,7 @@ package com.baeldung.activitispringdemo.util;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.junit.Test;
 
-import com.baeldung.activitispringdemo.CedingApplicationStatus;
+import com.baeldung.activitispringdemo.activiti.CedingApplicationStatus;
 import com.baeldung.activitispringdemo.util.ActivitiFormParser;
 
 import static org.mockito.Mockito.*;

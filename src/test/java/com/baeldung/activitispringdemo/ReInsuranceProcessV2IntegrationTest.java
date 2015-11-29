@@ -19,7 +19,8 @@ import org.junit.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dumbster.smtp.SimpleSmtpServer;
+import com.baeldung.activitispringdemo.activiti.BusinessClassified;
+import com.baeldung.activitispringdemo.activiti.CreateCedingFormDTO;
 
 import static org.hamcrest.CoreMatchers.*;
 import static com.baeldung.activitispringdemo.activiti.ConstantActivitiProcesses.*;
@@ -73,7 +74,6 @@ public class ReInsuranceProcessV2IntegrationTest {
     // @org.junit.Test
     @Deployment(resources={"reinsurance_process_v2.bpmn20.xml"})
     public void test1() {
-        SimpleSmtpServer mailServer = SimpleSmtpServer.start(11111);
         this.initActivitiObjects();
         this.initUsersAndGroups();
 
@@ -84,7 +84,6 @@ public class ReInsuranceProcessV2IntegrationTest {
         this.checkForFacultativeCodeAndBusinessClass();
         this.inputCedingData(null);
         this.saveCedingApplication();
-        mailServer.stop();
     }
 
 

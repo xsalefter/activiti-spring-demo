@@ -41,7 +41,7 @@
         <activiti:formProperty id="facultative_code" name="Facultative Code" type="string" variable="facultative_code"></activiti:formProperty>
       </extensionElements>
     </userTask>
-    <serviceTask id="check_code_and_business_class" name="Check for facultative code and business classified" activiti:class="com.baeldung.activitispringdemo.activiti.FacultativeCodeAndBusinessClassifiedHandler"></serviceTask>
+    <serviceTask id="check_code_and_business_class" name="Check for facultative code and business classified" activiti:delegateExpression="${cedingApplicationActivitiValidator}"></serviceTask>
     <exclusiveGateway id="found_notfound_gateway"></exclusiveGateway>
     <userTask id="input_ceding_application_form" name="Input ceding application" activiti:candidateGroups="front-admin">
       <extensionElements>

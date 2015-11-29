@@ -16,8 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.baeldung.activitispringdemo.BusinessClassified;
-import com.baeldung.activitispringdemo.CedingApplicationStatus;
+import com.baeldung.activitispringdemo.activiti.BusinessClassified;
+import com.baeldung.activitispringdemo.activiti.CedingApplicationStatus;
 
 @Entity
 @Table(name="ceding_application")
