@@ -9,6 +9,7 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.task.Task;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,11 +17,11 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.baeldung.activitispringdemo.activiti.BusinessClassified;
-import com.baeldung.activitispringdemo.activiti.CedingApplicationActivitiValidator;
 import com.baeldung.activitispringdemo.activiti.CedingApplicationStatus;
 import com.baeldung.activitispringdemo.activiti.CreateCedingFormDTO;
 import com.baeldung.activitispringdemo.repository.CedingApplicationRepository;
@@ -36,10 +37,18 @@ public class ReInsuranceDemoIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ReInsuranceDemoIntegrationTest.class);
 
-    @Autowired private ProcessEngineConfiguration processEngineConfiguration;
-    @Autowired private ProcessEngine processEngine;
-    @Autowired private CedingApplicationRepository cedingApplicationRepository;
-    @Autowired private CedingApplicationActivitiValidator cedingApplicationActivitiValidator;
+    @Autowired 
+    private ProcessEngineConfiguration processEngineConfiguration;
+
+    @Autowired 
+    private ProcessEngine processEngine;
+
+    @Autowired 
+    private CedingApplicationRepository cedingApplicationRepository;
+
+    @Autowired
+    @Qualifier("cedingApplicationActivitiValidator")
+    private JavaDelegate cedingApplicationActivitiValidator;
 
     private ReInsuranceDemoWorkFlow workFlow;
 
@@ -76,8 +85,6 @@ public class ReInsuranceDemoIntegrationTest {
                     final Map<String, Object> taskProcessVars = currentRunningTask.getProcessVariables();
 
                     logger.info(">> Processing Task with TaskID: {}, TaskName: {}, ExecutionId: {},  TaskVariables: {}", taskId, executionId, taskName, taskProcessVars);
-
-                    this.workFlow.getRuntimeService().setVariable(executionId, "cedingApplicationActivitiValidator", this.cedingApplicationActivitiValidator);
 
                     // Receive an offers
                     this.workFlow.receiveAnOffers(currentRunningTask, BusinessClassified.Others, "OF.001");

@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baeldung.activitispringdemo.entity.CedingApplication;
@@ -15,7 +15,7 @@ import com.baeldung.activitispringdemo.spring.ApplicationConfiguration;
 import com.baeldung.activitispringdemo.util.StringUtils;
 import static com.baeldung.activitispringdemo.activiti.ConstantActivitiAttributes.*;
 
-@Component
+@Service
 public class CedingApplicationActivitiValidator implements JavaDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(CedingApplicationActivitiValidator.class);
@@ -35,12 +35,14 @@ public class CedingApplicationActivitiValidator implements JavaDelegate {
         if (businessClassified.equals(BusinessClassified.Others)) {
             if ( !StringUtils.nullOrEmpty(facultativeCode) ) {
                 logger.info(">>> Would looking at master database for facultative code.");
+
+                CedingApplication application = null;
                 if (this.cedingApplicationRepository == null) {
                     try (final AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext(ApplicationConfiguration.class)) {
                         this.cedingApplicationRepository = appContext.getBean(CedingApplicationRepository.class);
+                        application = this.cedingApplicationRepository.findByFacultativeCode(facultativeCode);
                     }
                 }
-                final CedingApplication application = this.cedingApplicationRepository.findByFacultativeCode(facultativeCode);
 
                 logger.info(">>> If found, activiti variable expression 'facultative_code_and_business_class_valid' would set to true.");
                 logger.info(">>> If not found, activiti variable expression 'facultative_code_and_business_class_valid' would set to false.");

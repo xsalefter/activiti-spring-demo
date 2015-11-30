@@ -28,17 +28,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@ComponentScan(value={"com.baeldung.activitispringdemo.activiti"})
+@ComponentScan(value={"com.baeldung.activitispringdemo.activiti", "com.baeldung.activitispringdemo.spring"})
 @EnableJpaRepositories(value={"com.baeldung.activitispringdemo.repository"})
 @EnableTransactionManagement
 public class ApplicationConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationConfiguration.class);
 
-    public static final String ACTIVITI_JDBC_URL = "jdbc:h2:mem:activiti_workflow;DB_CLOSE_DELAY=1000";
+    public static final String ACTIVITI_JDBC_URL = "jdbc:h2:mem:activiti_workflow;DB_CLOSE_DELAY=10000";
     public static final String ACTIVITI_JDBC_USER = "sa";
     public static final String ACTIVITI_JDBC_PASSWORD = "";
-    public static final String APP_JDBC_URL = "jdbc:h2:mem:activiti_app;DB_CLOSE_DELAY=1000";
+    public static final String APP_JDBC_URL = "jdbc:h2:mem:activiti_app;DB_CLOSE_DELAY=10000";
     public static final String APP_JDBC_USER = "sa";
     public static final String APP_JDBC_PASSWORD = "";
 
@@ -120,7 +120,7 @@ public class ApplicationConfiguration {
     private static Properties createJpaProperties() {
         Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         return properties;
     }
 }
